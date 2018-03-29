@@ -1,56 +1,130 @@
 # **Finding Lane Lines on the Road** 
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
-<img src="examples/laneLines_thirdPass.jpg" width="480" alt="Combined Image" />
 
-Overview
+**Finding Lane Lines on the Road**
+
+The goals / steps of this project are the following:
+
+* Make a pipeline that finds lane lines on the road
+* Reflect on your work in a written report
+
+
+[//]: # (Image References)
+
+[image1]: ./examples/grayscale.jpg "Grayscale"
+
 ---
 
-When we drive, we use our eyes to decide where to go.  The lines on the road that show us where the lanes are act as our constant reference for where to steer the vehicle.  Naturally, one of the first things we would like to do in developing a self-driving car is to automatically detect lane lines using an algorithm.
+# Reflection
 
-In this project you will detect lane lines in images using Python and OpenCV.  OpenCV means "Open-Source Computer Vision", which is a package that has many useful tools for analyzing images.  
+## 1. Pipeline
 
-To complete the project, two files will be submitted: a file containing project code and a file containing a brief write up explaining your solution. We have included template files to be used both for the [code](https://github.com/udacity/CarND-LaneLines-P1/blob/master/P1.ipynb) and the [writeup](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md).The code file is called P1.ipynb and the writeup template is writeup_template.md 
+The image processing pipeline is implemented by the `pipeline` function. It has the following steps:
 
-To meet specifications in the project, take a look at the requirements in the [project rubric](https://review.udacity.com/#!/rubrics/322/view)
+  - Convert the image to greyscale
+  - Smoothen it out using Gaussian blur 
+  - Use canny edge detection to detect edges
+  - Mask the image in a quadrialateral to focus on the section of the image with the highest likelihood of lanes  
+  - Detect the lanes using Hough transform
+  - Draw the lines and overlay it on the test image 
+
+**Running experiments**
+
+The pipeline is driven through the `run_test_on_images` and `run_test_on_videos` functions. These functions allows us to run different line drawing algorithms on the test images & videos.
+
+###Experiments   
+ 
+I tried 3 algorithms to draw lines. They are described below with a brief description of the results
+
+    
+1. **Base case with default function provided in the sample code**
+    
+    This case verifies that the pipeline works as expected and helps in tuning the values for the vertices of the masking quadrilateral, gaussian blur, thresholds for Canny edge detection and Hough transform.
+
+    **Results**
+
+    The pipeline detects the lanes well on both the test images and videos. The results can be viewed at 
+    * [test_images_output/default](test_images_output/default)
+    * [test_videos_output/default](test_videos_output/default)
 
 
-Creating a Great Writeup
----
-For this project, a great writeup should provide a detailed response to the "Reflection" section of the [project rubric](https://review.udacity.com/#!/rubrics/322/view). There are three parts to the reflection:
+1. **Drawing lines on lanes using average slope**
+    
+    The idea is to classify lines into left and right lanes using the slope. Once the the lines are classified, calculate the average slope fo each category and draw lines from the bottom of the image to somewhere in the middle.
+    
+    The algorithm is 
+    
+    ```
+    This function extrapolates the lines found by the Hough tranform. The algorithm is :
 
-1. Describe the pipeline
+	For each line:
+    - Calculate slope of the line
+    - If slope > 0, then classify the line as left lane
+                    else classify the line as right lane
+    - Calculate average slope and intercept for left and right lanes
+    - Draw lines with the calculated left and right slopes that connects Y=image.height and Y=image.height/1.5
+    ```
 
-2. Identify any shortcomings
+    **Results**
 
-3. Suggest possible improvements
+    The pipeline draws line reasonably well on the lanes. Although some lines are out of alignment in a few of the test images. It fails badly on the challenge. 
+    
+    The results can be viewed at 
+    * [test_images_output/average_slope](test_images_output/average_slope)
+    * [test_videos_output/average_slope](test_videos_output/average_slope)
 
-We encourage using images in your writeup to demonstrate how your pipeline works.  
+1. **Drawing lines on lanes by fitting a line through the points from the Hough transform**
+    
+    The idea is to classify lines into left and right lanes using the slope. Once the the lines are classified, fit a line through the points in both these classes and draw lines from the bottom of the image to somewhere in the middle. 
+    
+    Reference : [Extrapolating lines](http://ottonello.gitlab.io/selfdriving/nanodegree/python/line%20detection/2016/12/18/extrapolating_lines.html
+)
+    
+    The algorithm is 
+    
+    ```
+    This function extrapolates the lines found by the Hough tranform. The algorithm is :
 
-All that said, please be concise!  We're not looking for you to write a book here: just a brief description.
+	For each line:
+    - Calculate slope of the line
+    - If slope > 0, then classify the line as left lane
+        else classify the line as right lane
+    - Calculate a line that passes through the points for left and right lanes using least squares (L2 norm)
+    - Draw lines with the calculated left and right slopes that connects Y=image.height and Y=image.height/1.5
 
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup. Here is a link to a [writeup template file](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md). 
+    ```
+
+    **Results**
+
+    The pipeline performs better on than average. This algorithm too fails badly on the challenge. 
+    
+    The results can be viewed at 
+    * [test_images_output/fit](test_images_output/fit)
+    * [test_videos_output/fit](test_videos_output/fit)
 
 
-The Project
----
 
-## If you have already installed the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) you should be good to go!   If not, you should install the starter kit to get started on this project. ##
+## 2. Shortcomings
+The shortcomings of this all the pipeline above are:
 
-**Step 1:** Set up the [CarND Term1 Starter Kit](https://classroom.udacity.com/nanodegrees/nd013/parts/fbf77062-5703-404e-b60c-95b78b2f3f9e/modules/83ec35ee-1e02-48a5-bdb7-d244bd47c2dc/lessons/8c82408b-a217-4d09-b81d-1bda4c6380ef/concepts/4f1870e0-3849-43e4-b670-12e6f2d4b7a7) if you haven't already.
+- Expects the lane to be in the same position. If the camera is mounted in a different alignment, the pipeline will need to be tuned differently.
+- The pipeline is very sensitive to noise and imperfections on the road.
+- The pipeline does not handle steep curves on the road very well.
+- The pipeline will not perform well in rainy conditions as the training set does not have any such images.
 
-**Step 2:** Open the code in a Jupyter Notebook
+This is also the reason it performs badly on the challenge as well on some parts of the video.
 
-You will complete the project code in a Jupyter notebook.  If you are unfamiliar with Jupyter Notebooks, check out <A HREF="https://www.packtpub.com/books/content/basics-jupyter-notebook-and-python" target="_blank">Cyrille Rossant's Basics of Jupyter Notebook and Python</A> to get started.
 
-Jupyter is an Ipython notebook where you can run blocks of code and see results interactively.  All the code for this project is contained in a Jupyter notebook. To start Jupyter in your browser, use terminal to navigate to your project directory and then run the following command at the terminal prompt (be sure you've activated your Python 3 carnd-term1 environment as described in the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) installation instructions!):
+## 3. Possible improvements
 
-`> jupyter notebook`
+We can improve the pipeline to be more robust by 
 
-A browser window will appear showing the contents of the current directory.  Click on the file called "P1.ipynb".  Another browser window will appear displaying the notebook.  Follow the instructions in the notebook to complete the project.  
+* Devise a algorithm or train a model to figure out the vertices of the masking region based on the alignment of the camera.
+* Filter out the noise while drawing lines. Some ideas to try out are - 
+	- Drop all lines whose slope is 1 or 2 SD away from the average slope
+	- Use L1 norm for fitting lines as it is more resilient to outliers
 
-**Step 3:** Complete the project and submit both the Ipython notebook and the project writeup
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+
 
