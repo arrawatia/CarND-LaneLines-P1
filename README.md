@@ -78,7 +78,7 @@ The image processing pipeline is implemented by the `pipeline` function. It has 
 
 The pipeline is driven through the `run_test_on_images` and `run_test_on_videos` functions. These functions allows us to run different line drawing algorithms on the test images & videos.
 
-###Experiments   
+### Experiments   
  
 I tried 3 algorithms to draw lines. They are described below with a brief description of the results
 
