@@ -9,10 +9,55 @@ The goals / steps of this project are the following:
 * Make a pipeline that finds lane lines on the road
 * Reflect on your work in a written report
 
+---
 
-[//]: # (Image References)
+# Install
+(These are based on instructions here [configure_via_anaconda](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/doc/configure_via_anaconda.md) )
 
-[image1]: ./examples/grayscale.jpg "Grayscale"
+1. Install miniconda by following instructions in the link above.
+
+   Verify: You should see the following:
+   
+   ```
+   > conda -V
+    conda 4.4.10
+   ```
+
+2. Clone this repo : 
+
+    ```
+    git clone https://github.com/arrawatia/CarND-LaneLines-P1
+    ```
+
+3. Setup the conda env
+
+    ```
+    cd CarND-LaneLines-P1
+    conda env create -f environment.yml
+    source activate lanelines
+    ```
+    
+    Verify: Your python should point to lanelines env
+    
+    ```
+    > which python
+    /home/arrawatia/miniconda3/envs/lanelines/bin/python
+    ```
+    
+    You should have the following packages installed.
+    
+    ```
+    conda list
+    ```
+    The package list should match [installed-packages](installed-packages.txt)
+    
+4. Start Jupyter notebook
+
+   ```
+   jupyter notebook
+   ```
+
+5. Access the URL shown in logs and run the P1 notebook.
 
 ---
 
