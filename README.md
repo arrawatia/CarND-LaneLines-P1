@@ -151,19 +151,18 @@ I tried 3 algorithms to draw lines. They are described below with a brief descri
 
 
 ## 2. Shortcomings
-The shortcomings of this all the pipeline above are:
+The shortcomings of the pipeline are:
 
 - Expects the lane to be in the same position. If the camera is mounted in a different alignment, the pipeline will need to be tuned differently.
 - The pipeline is very sensitive to noise and imperfections on the road.
 - The pipeline does not handle steep curves on the road very well.
 - The pipeline will not perform well in rainy conditions as the training set does not have any such images.
 
-This is also the reason it performs badly on the challenge as well on some parts of the video.
-
+Some of these shortcomings might be the reason for the bad perfromance of the pipeline on the challenge (as well on some parts of the test videos).
 
 ## 3. Possible improvements
 
-We can improve the pipeline to be more robust by 
+We can improve the pipeline to make it more robust in following ways:
 
 * Devise a algorithm or train a model to figure out the vertices of the masking region based on the alignment of the camera.
 * Filter out the noise while drawing lines. Some ideas to try out are - 
