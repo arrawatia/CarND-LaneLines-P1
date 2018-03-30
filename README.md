@@ -158,7 +158,7 @@ The shortcomings of the pipeline are:
 - The pipeline does not handle steep curves on the road very well.
 - The pipeline will not perform well in rainy conditions as the training set does not have any such images.
 
-Some of these shortcomings might be the reason for the bad perfromance of the pipeline on the challenge (as well on some parts of the test videos).
+Some of these shortcomings might be the reason for the bad performance of the pipeline on the challenge (as well on some parts of the test videos).
 
 ## 3. Possible improvements
 
